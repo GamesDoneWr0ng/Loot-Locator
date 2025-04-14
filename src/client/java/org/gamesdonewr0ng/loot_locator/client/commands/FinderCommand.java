@@ -14,7 +14,7 @@ import net.minecraft.loot.entry.ItemEntry;
 import net.minecraft.loot.entry.LootPoolEntry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.text.Text;
-import org.gamesdonewr0ng.loot_locator.client.Loot_locatorClient;
+import org.gamesdonewr0ng.loot_locator.client.LootLocatorClient;
 import org.gamesdonewr0ng.loot_locator.client.util.IItemEntry;
 import org.gamesdonewr0ng.loot_locator.client.util.ILootTable;
 
@@ -44,7 +44,7 @@ Usage options:
     }
 
     private static boolean isInLootTable(RegistryKey<LootTable> lootTableKey, Item item) {
-        LootTable table = Loot_locatorClient.INSTANCE.lootTableHelper.getLootTable(lootTableKey);
+        LootTable table = LootLocatorClient.INSTANCE.lootTableHelper.getLootTable(lootTableKey);
         for (LootPool pool : ((ILootTable) table).lootLocator$getPools()) {
             for (LootPoolEntry entry : pool.entries) {
                 if (entry instanceof ItemEntry itemEntry) {

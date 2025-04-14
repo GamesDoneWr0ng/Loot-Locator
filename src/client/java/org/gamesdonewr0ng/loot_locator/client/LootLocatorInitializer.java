@@ -2,7 +2,7 @@ package org.gamesdonewr0ng.loot_locator.client;
 
 import net.fabricmc.api.ClientModInitializer;
 
-public class Loot_locatorInitializer implements ClientModInitializer {
+public class LootLocatorInitializer implements ClientModInitializer {
     private boolean initialized;
 
     @Override
@@ -11,7 +11,7 @@ public class Loot_locatorInitializer implements ClientModInitializer {
             throw new RuntimeException(
                     "WurstInitializer.onInitialize() ran twice!");
 
-        Loot_locatorClient.INSTANCE.initialize();
+        LootLocatorClient.INSTANCE.initialize();
         initialized = true;
     }
 }

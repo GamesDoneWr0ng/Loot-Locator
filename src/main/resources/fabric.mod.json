@@ -11,7 +11,7 @@
   "environment": "client",
   "entrypoints": {
     "client": [
-      "org.gamesdonewr0ng.loot_locator.client.Loot_locatorInitializer"
+      "org.gamesdonewr0ng.loot_locator.client.LootLocatorInitializer"
     ],
     "main": [
       "org.gamesdonewr0ng.loot_locator.Loot_locator"

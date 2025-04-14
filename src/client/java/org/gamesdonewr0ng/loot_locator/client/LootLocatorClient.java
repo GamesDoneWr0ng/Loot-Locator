@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
 
-public enum Loot_locatorClient {
+public enum LootLocatorClient {
     INSTANCE;
 
     public Logger LOGGER;
