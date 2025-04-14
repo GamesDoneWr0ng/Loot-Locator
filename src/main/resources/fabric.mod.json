@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "loot_locator",
+  "version": "${version}",
+  "name": "Loot  Locator",
+  "description": "",
+  "authors": [],
+  "contact": {},
+  "license": "All-Rights-Reserved",
+  "icon": "assets/loot_locator/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "org.gamesdonewr0ng.loot_locator.client.Loot_locatorInitializer"
+    ],
+    "main": [
+      "org.gamesdonewr0ng.loot_locator.Loot_locator"
+    ]
+  },
+  "mixins": [
+    "loot_locator.mixins.json",
+    {
+      "config": "loot_locator.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}

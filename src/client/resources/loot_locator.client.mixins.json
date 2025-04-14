@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "org.gamesdonewr0ng.loot_locator.client.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "ClientPlayNetworkHandlerMixin",
+    "LootTableMixin",
+    "ItemEntryMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
