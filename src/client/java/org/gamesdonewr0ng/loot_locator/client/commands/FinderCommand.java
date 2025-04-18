@@ -17,6 +17,7 @@ import net.minecraft.text.Text;
 import org.gamesdonewr0ng.loot_locator.client.LootLocatorClient;
 import org.gamesdonewr0ng.loot_locator.client.util.IItemEntry;
 import org.gamesdonewr0ng.loot_locator.client.util.ILootTable;
+import org.gamesdonewr0ng.loot_locator.client.util.ItemHelper;
 
 import java.util.stream.Stream;
 
@@ -29,14 +30,19 @@ Usage options:
                 .then(ClientCommandManager.literal("loot")
                         .then(ClientCommandManager.argument("item", ItemStackArgumentType.itemStack(registryAccess))
                                 .executes(context -> {
-                                    Item item = ItemStackArgumentType.getItemStackArgument(context, "item").getItem();
-                                    Stream<RegistryKey<LootTable>> lootTables = LootTables.getAll().stream().filter(i -> isInLootTable(i, item));
+                                    Item mcItem = ItemStackArgumentType.getItemStackArgument(context, "item").getItem();
+                                    Stream<RegistryKey<LootTable>> lootTables = LootTables.getAll().stream().filter(i -> isInLootTable(i, mcItem));
 
                                     context.getSource().sendFeedback(Text.literal("The item appears in " + lootTables.count() + " loot tables."));
+                                    com.seedfinding.mcfeature.loot.item.Item item = ItemHelper.getItem(mcItem);
 
 
                                     return Command.SINGLE_SUCCESS;
-                                })))
+                                }))
+                        .executes(context -> {
+                            context.getSource().sendFeedback(Text.literal("Please specify a item to search for."));
+                            return Command.SINGLE_SUCCESS;
+                        }))
                 .executes(context -> {
                     context.getSource().sendFeedback(Text.literal(helpMessage));
                     return Command.SINGLE_SUCCESS;
