@@ -6,8 +6,9 @@ import com.seedfinding.mcfeature.structure.DesertPyramid;
 
 public class DesertTempleSearcher extends Searcher<DesertPyramid> {
 
-    public DesertTempleSearcher(DesertPyramid structure, int salt) {
-        super(structure, salt);
+    public DesertTempleSearcher() {
+        super();
+        this.STRUCTURE = new DesertPyramid(VERSION);
     }
 
     public boolean isInStructure(CPos cPos, Item target) {

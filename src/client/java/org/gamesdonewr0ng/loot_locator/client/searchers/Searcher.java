@@ -7,40 +7,25 @@ import com.seedfinding.mccore.util.pos.BPos;
 import com.seedfinding.mccore.util.pos.CPos;
 import com.seedfinding.mccore.util.pos.RPos;
 import com.seedfinding.mccore.version.MCVersion;
-import com.seedfinding.mcfeature.structure.Structure;
-import com.seedfinding.mcterrain.TerrainGenerator;
+import com.seedfinding.mcfeature.loot.item.Item;
+import com.seedfinding.mcfeature.structure.UniformStructure;
 import org.gamesdonewr0ng.loot_locator.client.LootLocatorClient;
 
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
-abstract class Searcher<T extends Structure> {
-    private final long SEED = LootLocatorClient.INSTANCE.seed;
-    private final MCVersion VERSION = LootLocatorClient.INSTANCE.VERSION;
-    private final T STRUCTURE;
-    private final int spacing;
-    private final int salt;
-    private final int separation;
-    private final int biomeY;
-
+abstract class Searcher<T extends UniformStructure> {
+    long SEED = LootLocatorClient.INSTANCE.seed;
+    MCVersion VERSION = LootLocatorClient.INSTANCE.VERSION;
+    T STRUCTURE;
     private PriorityQueue<RPos> regionQueue;
     private PriorityQueue<CPos> structureQueue;
     private int n;
 
-    Searcher(T structure, int spacing, int separation, int salt, int biomeY) {
-        STRUCTURE = structure;
-        this.spacing = spacing;
-        this.separation = separation;
-        this.salt = salt;
-        this.biomeY = biomeY;
-    }
+    Searcher() {}
 
-    Searcher(T structure, int salt) {
-        this(structure, 32, 8, salt,  70);
-    }
-
-    public void fillStructures(BPos startPos, BiomeSource source, TerrainGenerator terrainGenerator) {
-        RPos startRPos = startPos.toRegionPos(spacing * 16);
+    public void fillStructures(BPos startPos, BiomeSource source) {
+        RPos startRPos = startPos.toRegionPos(STRUCTURE.getSpacing() * 16);
         ChunkRand rand = new ChunkRand();
 
         if (regionQueue == null) {
@@ -58,9 +43,10 @@ abstract class Searcher<T extends Structure> {
             n++;
 
             RPos nextRPos;
-            while ((nextRPos = regionQueue.poll()) != null && nextRPos.distanceTo(startRPos, DistanceMetric.EUCLIDEAN) <= n) {
-                CPos cPos = getInRegion(SEED, nextRPos, rand);
-                if (STRUCTURE.isValidBiome(source.getBiome(cPos.toBlockPos(biomeY))) && STRUCTURE.isValidTerrain(terrainGenerator, cPos.getX(), cPos.getZ())) {
+            while ((nextRPos = regionQueue.poll()) != null && nextRPos.distanceTo(startRPos, DistanceMetric.EUCLIDEAN_SQ) <= n*n) {
+                rand.setCarverSeed(SEED, nextRPos.getX(), nextRPos.getZ(), VERSION);
+                CPos cPos = STRUCTURE.getInRegion(SEED, nextRPos.getX(), nextRPos.getZ(), rand);
+                if (STRUCTURE.canSpawn(cPos, source)) {
                     structureQueue.offer(cPos);
                 }
             }
@@ -70,9 +56,9 @@ abstract class Searcher<T extends Structure> {
         }
     }
 
-    public CPos nextStructurePos(BPos startPos, BiomeSource source, TerrainGenerator terrainGenerator) {
-        if (structureQueue.isEmpty()) {
-            fillStructures(startPos, source, terrainGenerator);
+    public CPos nextStructurePos(BPos startPos, BiomeSource source) {
+        if (structureQueue == null || structureQueue.isEmpty()) {
+            fillStructures(startPos, source);
         }
         return structureQueue.poll();
     }
@@ -80,6 +66,7 @@ abstract class Searcher<T extends Structure> {
     private void getRegions(RPos center, int n) {
         if (n == 0) {
             regionQueue.add(new RPos(center.getX(), center.getZ(), center.getRegionSize()));
+            return;
         }
 
         for (int dx = -n; dx <= n; dx++) {
@@ -92,12 +79,5 @@ abstract class Searcher<T extends Structure> {
         }
     }
 
-    private CPos getInRegion(long seed, RPos regionPos, ChunkRand rand) {
-        rand.setRegionSeed(seed, regionPos.getX(), regionPos.getZ(), salt, VERSION);
-
-        return new CPos(
-                regionPos.getX() * spacing + rand.nextInt(spacing - separation),
-                regionPos.getX() * spacing + rand.nextInt(spacing - separation)
-        );
-    }
+    abstract boolean isInStructure(CPos cPos, Item target);
 }
