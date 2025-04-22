@@ -43,12 +43,12 @@ dependencies {
     implementation('com.seedfinding:mc_seed:LATEST') { transitive = false }
     implementation('com.seedfinding:mc_core:LATEST') { transitive = false }
     implementation('com.seedfinding:mc_noise:LATEST') { transitive = false }
-
     implementation('com.seedfinding:mc_biome:LATEST') { transitive = false }
     implementation('com.seedfinding:mc_terrain:LATEST') { transitive = false }
-
     implementation('com.seedfinding:mc_reversal:LATEST') { transitive = false }
     implementation('com.seedfinding:mc_feature:LATEST') { transitive = false }
+
+    implementation 'net.java.dev.jna:jna:5.13.0'
 }
 
 processResources {

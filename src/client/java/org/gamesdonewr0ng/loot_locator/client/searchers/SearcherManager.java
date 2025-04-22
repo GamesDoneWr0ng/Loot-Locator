@@ -1,7 +1,5 @@
 package org.gamesdonewr0ng.loot_locator.client.searchers;
 
-import com.seedfinding.mcbiome.source.BiomeSource;
-import com.seedfinding.mccore.state.Dimension;
 import com.seedfinding.mccore.util.math.DistanceMetric;
 import com.seedfinding.mccore.util.pos.BPos;
 import com.seedfinding.mccore.util.pos.CPos;
@@ -13,6 +11,7 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.dimension.DimensionTypes;
 import org.gamesdonewr0ng.loot_locator.client.LootLocatorClient;
+import org.gamesdonewr0ng.loot_locator.client.util.CubiomesLibrary;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +22,7 @@ public class SearcherManager {
     MCVersion VERSION = LootLocatorClient.INSTANCE.VERSION;
     private final List<Searcher> searchers;
     private final List<CPos> positions;
-    private BiomeSource source;
+    private CubiomesLibrary.Generator generator;
     private final BPos pos;
 
     public SearcherManager(Stream<RegistryKey<LootTable>> lootTables, BPos pos, RegistryKey<DimensionType> dimension) {
@@ -51,12 +50,20 @@ public class SearcherManager {
     }
 
     private void init(RegistryKey<DimensionType> dimension) {
-        if      (dimension.equals(DimensionTypes.OVERWORLD))  {source = BiomeSource.of(Dimension.OVERWORLD, VERSION, SEED);}
-        else if (dimension.equals(DimensionTypes.THE_NETHER)) {source = BiomeSource.of(Dimension.NETHER, VERSION, SEED);}
-        else {source = BiomeSource.of(Dimension.END, VERSION, SEED);}
+        generator = new CubiomesLibrary.Generator();
+        CubiomesLibrary.INSTANCE.setupGenerator(generator, 68, 0);
+        if (dimension.equals(DimensionTypes.OVERWORLD))  {
+            CubiomesLibrary.INSTANCE.applySeed(generator, 0, SEED);
+        }
+        else if (dimension.equals(DimensionTypes.THE_NETHER)) {
+            CubiomesLibrary.INSTANCE.applySeed(generator, -1, SEED);
+        }
+        else {
+            CubiomesLibrary.INSTANCE.applySeed(generator, 1, SEED);
+        }
 
         for (Searcher searcher : searchers) {
-            positions.add(searcher.nextStructurePos(pos, source));
+            positions.add(searcher.nextStructurePos(pos, generator));
         }
     }
 
@@ -76,7 +83,7 @@ public class SearcherManager {
         }
         while (true) {
             CPos res = positions.get(minIdx);
-            positions.set(minIdx, searchers.get(minIdx).nextStructurePos(pos, source));
+            positions.set(minIdx, searchers.get(minIdx).nextStructurePos(pos, generator));
             if (item == null || searchers.get(minIdx).isInStructure(res, item)) {
                 return res;
             }

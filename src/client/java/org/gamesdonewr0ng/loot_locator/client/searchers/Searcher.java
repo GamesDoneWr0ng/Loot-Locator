@@ -1,6 +1,5 @@
 package org.gamesdonewr0ng.loot_locator.client.searchers;
 
-import com.seedfinding.mcbiome.source.BiomeSource;
 import com.seedfinding.mccore.rand.ChunkRand;
 import com.seedfinding.mccore.util.math.DistanceMetric;
 import com.seedfinding.mccore.util.pos.BPos;
@@ -10,6 +9,7 @@ import com.seedfinding.mccore.version.MCVersion;
 import com.seedfinding.mcfeature.loot.item.Item;
 import com.seedfinding.mcfeature.structure.UniformStructure;
 import org.gamesdonewr0ng.loot_locator.client.LootLocatorClient;
+import org.gamesdonewr0ng.loot_locator.client.util.CubiomesLibrary;
 
 import java.util.Comparator;
 import java.util.PriorityQueue;
@@ -24,7 +24,7 @@ abstract class Searcher<T extends UniformStructure> {
 
     Searcher() {}
 
-    public void fillStructures(BPos startPos, BiomeSource source) {
+    public void fillStructures(BPos startPos, CubiomesLibrary.Generator generator) {
         RPos startRPos = startPos.toRegionPos(STRUCTURE.getSpacing() * 16);
         ChunkRand rand = new ChunkRand();
 
@@ -46,7 +46,7 @@ abstract class Searcher<T extends UniformStructure> {
             while ((nextRPos = regionQueue.poll()) != null && nextRPos.distanceTo(startRPos, DistanceMetric.EUCLIDEAN_SQ) <= n*n) {
                 rand.setCarverSeed(SEED, nextRPos.getX(), nextRPos.getZ(), VERSION);
                 CPos cPos = STRUCTURE.getInRegion(SEED, nextRPos.getX(), nextRPos.getZ(), rand);
-                if (STRUCTURE.canSpawn(cPos, source)) {
+                if (isValid(cPos, generator)) {
                     structureQueue.offer(cPos);
                 }
             }
@@ -56,9 +56,9 @@ abstract class Searcher<T extends UniformStructure> {
         }
     }
 
-    public CPos nextStructurePos(BPos startPos, BiomeSource source) {
+    public CPos nextStructurePos(BPos startPos, CubiomesLibrary.Generator generator) {
         if (structureQueue == null || structureQueue.isEmpty()) {
-            fillStructures(startPos, source);
+            fillStructures(startPos, generator);
         }
         return structureQueue.poll();
     }
@@ -80,4 +80,6 @@ abstract class Searcher<T extends UniformStructure> {
     }
 
     abstract boolean isInStructure(CPos cPos, Item target);
+
+    abstract boolean isValid(CPos cPos, CubiomesLibrary.Generator generator);
 }
